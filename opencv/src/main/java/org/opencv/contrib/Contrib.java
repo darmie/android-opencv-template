@@ -98,6 +98,7 @@ public class Contrib {
         Mat cost_mat = cost;
         int retVal = chamerMatching_0(img.nativeObj, templ.nativeObj, results_mat.nativeObj, cost_mat.nativeObj, templScale, maxMatches, minMatchDistance, padX, padY, scales, minScale, maxScale, orientationWeight, truncate);
         Converters.Mat_to_vector_vector_Point(results_mat, results);
+        results_mat.release();
         return retVal;
     }
 
@@ -107,6 +108,7 @@ public class Contrib {
         Mat cost_mat = cost;
         int retVal = chamerMatching_1(img.nativeObj, templ.nativeObj, results_mat.nativeObj, cost_mat.nativeObj);
         Converters.Mat_to_vector_vector_Point(results_mat, results);
+        results_mat.release();
         return retVal;
     }
 

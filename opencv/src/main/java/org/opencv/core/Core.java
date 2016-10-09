@@ -12,12 +12,12 @@ import org.opencv.utils.Converters;
 public class Core {
 
     // these constants are wrapped inside functions to prevent inlining
-    private static String getVersion() { return "2.4.10.0"; }
-    private static String getNativeLibraryName() { return "opencv_java2410"; }
+    private static String getVersion() { return "2.4.13.1"; }
+    private static String getNativeLibraryName() { return "opencv_java2413"; }
     private static int getVersionEpoch() { return 2; }
     private static int getVersionMajor() { return 4; }
-    private static int getVersionMinor() { return 10; }
-    private static int getVersionRevision() { return 0; }
+    private static int getVersionMinor() { return 13; }
+    private static int getVersionRevision() { return 1; }
 
     public static final String VERSION = getVersion();
     public static final String NATIVE_LIBRARY_NAME = getNativeLibraryName();
@@ -106,6 +106,13 @@ public class Core {
             KMEANS_RANDOM_CENTERS = 0,
             KMEANS_PP_CENTERS = 2,
             KMEANS_USE_INITIAL_LABELS = 1,
+            MARKER_CROSS = 0,
+            MARKER_TILTED_CROSS = 1,
+            MARKER_STAR = 2,
+            MARKER_DIAMOND = 3,
+            MARKER_SQUARE = 4,
+            MARKER_TRIANGLE_UP = 5,
+            MARKER_TRIANGLE_DOWN = 6,
             FONT_HERSHEY_SIMPLEX = 0,
             FONT_HERSHEY_PLAIN = 1,
             FONT_HERSHEY_DUPLEX = 2,
@@ -985,7 +992,12 @@ public class Core {
  * @param pt2 The point the arrow points to.
  * @param color Line color.
  * @param thickness Line thickness.
- * @param line_type a line_type
+ * @param line_type Type of the line:
+ * <ul>
+ *   <li> 8 (or omitted) - 8-connected line.
+ *   <li> 4 - 4-connected line.
+ *   <li> CV_AA - antialiased line.
+ * </ul>
  * @param shift Number of fractional bits in the point coordinates.
  * @param tipLength The length of the arrow tip in relation to the arrow length
  *
@@ -3152,6 +3164,27 @@ public class Core {
 
 
     //
+    // C++:  void drawMarker(Mat& img, Point position, Scalar color, int markerType = MARKER_CROSS, int markerSize = 20, int thickness = 1, int line_type = 8)
+    //
+
+    public static void drawMarker(Mat img, Point position, Scalar color, int markerType, int markerSize, int thickness, int line_type)
+    {
+
+        drawMarker_0(img.nativeObj, position.x, position.y, color.val[0], color.val[1], color.val[2], color.val[3], markerType, markerSize, thickness, line_type);
+
+        return;
+    }
+
+    public static void drawMarker(Mat img, Point position, Scalar color)
+    {
+
+        drawMarker_1(img.nativeObj, position.x, position.y, color.val[0], color.val[1], color.val[2], color.val[3]);
+
+        return;
+    }
+
+
+    //
     // C++:  bool eigen(Mat src, bool computeEigenvectors, Mat& eigenvalues, Mat& eigenvectors)
     //
 
@@ -3826,6 +3859,49 @@ public class Core {
 
 
     //
+    // C++:  int getNumThreads()
+    //
+
+/**
+ * <p>Returns the number of threads used by OpenCV for parallel regions.
+ * Always returns 1 if OpenCV is built without threading support.</p>
+ *
+ * <p>The exact meaning of return value depends on the threading framework used by
+ * OpenCV library:</p>
+ * <ul>
+ *   <li> TBB – The number of threads, that OpenCV will try to use for
+ * parallel regions.
+ * </ul>
+ * <p>If there is any <code>tbb.thread_scheduler_init</code> in user code
+ * conflicting with OpenCV, then function returns default number of threads used
+ * by TBB library.</p>
+ * <ul>
+ *   <li> OpenMP – An upper bound on the number of threads that could be used
+ * to form a new team.
+ *   <li> Concurrency – The number of threads, that OpenCV will try to use for
+ * parallel regions.
+ *   <li> GCD – Unsupported; returns the GCD thread pool limit (512) for
+ * compatibility.
+ *   <li> C= – The number of threads, that OpenCV will try to use for parallel
+ * regions, if before called <code>setNumThreads</code> with <code>threads >
+ * 0</code>, otherwise returns the number of logical CPUs, available for the
+ * process.
+ * </ul>
+ *
+ * @see <a href="http://docs.opencv.org/modules/core/doc/utility_and_system_functions_and_macros.html#getnumthreads">org.opencv.core.Core.getNumThreads</a>
+ * @see org.opencv.core.Core#getThreadNum
+ * @see org.opencv.core.Core#setNumThreads
+ */
+    public static int getNumThreads()
+    {
+
+        int retVal = getNumThreads_0();
+
+        return retVal;
+    }
+
+
+    //
     // C++:  int getNumberOfCPUs()
     //
 
@@ -3884,6 +3960,43 @@ public class Core {
     {
 
         int retVal = getOptimalDFTSize_0(vecsize);
+
+        return retVal;
+    }
+
+
+    //
+    // C++:  int getThreadNum()
+    //
+
+/**
+ * <p>Returns the index of the currently executed thread within the current
+ * parallel region.
+ * Always returns 0 if called outside of parallel region.</p>
+ *
+ * <p>The exact meaning of return value depends on the threading framework used by
+ * OpenCV library:</p>
+ * <ul>
+ *   <li> TBB – Unsupported with current 4.1 TBB release. May be will be
+ * supported in future.
+ *   <li> OpenMP – The thread number, within the current team, of the calling
+ * thread.
+ *   <li> Concurrency – An ID for the virtual processor that the current
+ * context is executing on (0 for master thread and unique number for others,
+ * but not necessary 1,2,3,...).
+ *   <li> GCD – System calling thread's ID. Never returns 0 inside parallel
+ * region.
+ *   <li> C= – The index of the current parallel task.
+ * </ul>
+ *
+ * @see <a href="http://docs.opencv.org/modules/core/doc/utility_and_system_functions_and_macros.html#getthreadnum">org.opencv.core.Core.getThreadNum</a>
+ * @see org.opencv.core.Core#getNumThreads
+ * @see org.opencv.core.Core#setNumThreads
+ */
+    public static int getThreadNum()
+    {
+
+        int retVal = getThreadNum_0();
 
         return retVal;
     }
@@ -4985,7 +5098,8 @@ public class Core {
  * @param c a c
  * @param flags operation flags; currently, the only supported flag is
  * <code>DFT_ROWS</code>, which indicates that each row of <code>src1</code> and
- * <code>src2</code> is an independent 1D Fourier spectrum.
+ * <code>src2</code> is an independent 1D Fourier spectrum. If you do not want
+ * to use this flag, then simply add a "0" as value.
  * @param conjB optional flag that conjugates the second input array before the
  * multiplication (true) or not (false).
  *
@@ -5018,7 +5132,8 @@ public class Core {
  * @param c a c
  * @param flags operation flags; currently, the only supported flag is
  * <code>DFT_ROWS</code>, which indicates that each row of <code>src1</code> and
- * <code>src2</code> is an independent 1D Fourier spectrum.
+ * <code>src2</code> is an independent 1D Fourier spectrum. If you do not want
+ * to use this flag, then simply add a "0" as value.
  *
  * @see <a href="http://docs.opencv.org/modules/core/doc/operations_on_arrays.html#mulspectrums">org.opencv.core.Core.mulSpectrums</a>
  */
@@ -6220,7 +6335,7 @@ public class Core {
  * <p>The function <code>pow</code> raises every element of the input array to
  * <code>power</code> :</p>
  *
- * <p><em>dst(I) = src(I)^power if power is integer; |src(I)|^power
+ * <p><em>dst(I) = src(I)^(power) if power is integer; |src(I)|^(power)
  * otherwise&ltBR&gtSo, for a non-integer power exponent, the absolute values of
  * input array elements are used. However, it is possible to get true values for
  * negative values using some extra operations. In the example below, computing
@@ -6773,6 +6888,58 @@ public class Core {
 
 
     //
+    // C++:  void setNumThreads(int nthreads)
+    //
+
+/**
+ * <p>OpenCV will try to set the number of threads for the next parallel region.
+ * If <code>threads == 0</code>, OpenCV will disable threading optimizations and
+ * run all it's functions sequentially. Passing <code>threads < 0</code> will
+ * reset threads number to system default.
+ * This function must be called outside of parallel region.</p>
+ *
+ * <p>OpenCV will try to run it's functions with specified threads number, but some
+ * behaviour differs from framework:</p>
+ * <ul>
+ *   <li> TBB – User-defined parallel constructions will run with the same
+ * threads number, if another does not specified. If late on user creates own
+ * scheduler, OpenCV will be use it.
+ *   <li> OpenMP – No special defined behaviour.
+ *   <li> Concurrency – If <code>threads == 1</code>, OpenCV will disable
+ * threading optimizations and run it's functions sequentially.
+ *   <li> GCD – Supports only values <= 0.
+ *   <li> C= – No special defined behaviour.
+ * </ul>
+ *
+ * @param nthreads Number of threads used by OpenCV.
+ *
+ * @see <a href="http://docs.opencv.org/modules/core/doc/utility_and_system_functions_and_macros.html#setnumthreads">org.opencv.core.Core.setNumThreads</a>
+ * @see org.opencv.core.Core#getThreadNum
+ * @see org.opencv.core.Core#getNumThreads
+ */
+    public static void setNumThreads(int nthreads)
+    {
+
+        setNumThreads_0(nthreads);
+
+        return;
+    }
+
+
+    //
+    // C++:  void setRNGSeed(int seed)
+    //
+
+    public static void setRNGSeed(int seed)
+    {
+
+        setRNGSeed_0(seed);
+
+        return;
+    }
+
+
+    //
     // C++:  bool solve(Mat src1, Mat src2, Mat& dst, int flags = DECOMP_LU)
     //
 
@@ -7069,6 +7236,7 @@ public class Core {
         Mat mv_mat = new Mat();
         split_0(m.nativeObj, mv_mat.nativeObj);
         Converters.Mat_to_vector_Mat(mv_mat, mv);
+        mv_mat.release();
         return;
     }
 
@@ -8041,6 +8209,10 @@ public class Core {
     private static native void divide_6(long src1_nativeObj, double src2_val0, double src2_val1, double src2_val2, double src2_val3, long dst_nativeObj, double scale);
     private static native void divide_7(long src1_nativeObj, double src2_val0, double src2_val1, double src2_val2, double src2_val3, long dst_nativeObj);
 
+    // C++:  void drawMarker(Mat& img, Point position, Scalar color, int markerType = MARKER_CROSS, int markerSize = 20, int thickness = 1, int line_type = 8)
+    private static native void drawMarker_0(long img_nativeObj, double position_x, double position_y, double color_val0, double color_val1, double color_val2, double color_val3, int markerType, int markerSize, int thickness, int line_type);
+    private static native void drawMarker_1(long img_nativeObj, double position_x, double position_y, double color_val0, double color_val1, double color_val2, double color_val3);
+
     // C++:  bool eigen(Mat src, bool computeEigenvectors, Mat& eigenvalues, Mat& eigenvectors)
     private static native boolean eigen_0(long src_nativeObj, boolean computeEigenvectors, long eigenvalues_nativeObj, long eigenvectors_nativeObj);
 
@@ -8090,11 +8262,17 @@ public class Core {
     // C++:  int64 getCPUTickCount()
     private static native long getCPUTickCount_0();
 
+    // C++:  int getNumThreads()
+    private static native int getNumThreads_0();
+
     // C++:  int getNumberOfCPUs()
     private static native int getNumberOfCPUs_0();
 
     // C++:  int getOptimalDFTSize(int vecsize)
     private static native int getOptimalDFTSize_0(int vecsize);
+
+    // C++:  int getThreadNum()
+    private static native int getThreadNum_0();
 
     // C++:  int64 getTickCount()
     private static native long getTickCount_0();
@@ -8258,6 +8436,12 @@ public class Core {
     // C++:  void setIdentity(Mat& mtx, Scalar s = Scalar(1))
     private static native void setIdentity_0(long mtx_nativeObj, double s_val0, double s_val1, double s_val2, double s_val3);
     private static native void setIdentity_1(long mtx_nativeObj);
+
+    // C++:  void setNumThreads(int nthreads)
+    private static native void setNumThreads_0(int nthreads);
+
+    // C++:  void setRNGSeed(int seed)
+    private static native void setRNGSeed_0(int seed);
 
     // C++:  bool solve(Mat src1, Mat src2, Mat& dst, int flags = DECOMP_LU)
     private static native boolean solve_0(long src1_nativeObj, long src2_nativeObj, long dst_nativeObj, int flags);

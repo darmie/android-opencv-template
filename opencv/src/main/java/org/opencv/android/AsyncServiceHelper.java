@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 
 import org.opencv.core.Core;
 import org.opencv.engine.OpenCVEngineInterface;
+//import org.opencv.engine.*;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,8 +22,9 @@ class AsyncServiceHelper
             final LoaderCallbackInterface Callback)
     {
         AsyncServiceHelper helper = new AsyncServiceHelper(Version, AppContext, Callback);
-        if (AppContext.bindService(new Intent("org.opencv.engine.BIND"),
-                helper.mServiceConnection, Context.BIND_AUTO_CREATE))
+        Intent intent = new Intent("org.opencv.engine.BIND");
+        intent.setPackage("org.opencv.engine");
+        if (AppContext.bindService(intent, helper.mServiceConnection, Context.BIND_AUTO_CREATE))
         {
             return true;
         }
