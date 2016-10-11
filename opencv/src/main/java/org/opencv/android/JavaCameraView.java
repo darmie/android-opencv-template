@@ -194,7 +194,37 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                         mCamera.setPreviewTexture(mSurfaceTexture);
                     } else
                        mCamera.setPreviewDisplay(null);
+                    /* Finally we are ready to start the preview */
+                    // start preview with new settings
+                    try {
+                        // set preview size and make any resize, rotate or
+                        // reformatting changes here
+                        Camera.Parameters parameters = mCamera.getParameters();
 
+                        for (Camera.Size c_size : parameters.getSupportedPictureSizes()) {
+                            // 640 480
+                            // 960 720
+                            // 1024 768
+                            // 1280 720
+                            // 1600 1200
+                            // 2560 1920
+                            // 3264 2448
+                            // 2048 1536
+                            // 3264 1836
+                            // 2048 1152
+                            // 3264 2176
+                            if (1600 <= c_size.width & c_size.width <= 1920) {
+                                parameters.setPreviewSize(c_size.width, c_size.height);
+                                parameters.setPictureSize(c_size.width, c_size.height);
+                                break;
+                            }
+                        }
+                        mCamera.setParameters(parameters);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    setDisplayOrientation(mCamera, 90);
+                    mCamera.setPreviewDisplay(getHolder());
                     /* Finally we are ready to start the preview */
                     Log.d(TAG, "startPreview");
                     mCamera.startPreview();
@@ -209,7 +239,18 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
 
         return result;
     }
-
+    protected void setDisplayOrientation(Camera camera, int angle){
+        Method downPolymorphic;
+        try
+        {
+            downPolymorphic = camera.getClass().getMethod("setDisplayOrientation", new Class[] { int.class });
+            if (downPolymorphic != null)
+                downPolymorphic.invoke(camera, new Object[] { angle });
+        }
+        catch (Exception e1)
+        {
+        }
+    }
     protected void releaseCamera() {
         synchronized (this) {
             if (mCamera != null) {
